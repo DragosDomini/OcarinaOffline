@@ -38,10 +38,13 @@ jobs:
 
           config = Path("vite.config.ts")
           text = config.read_text()
-          if 'base: "/", ' not in text and 'base: "/",'
-          not in text:
+
+          if 'base: "/"' not in text:
               raise SystemExit("Vite base setting was not found.")
-          config.write_text(text.replace('base: "/",', 'base: "./",', 1))
+
+          config.write_text(
+              text.replace('base: "/",', 'base: "./",', 1)
+          )
           PY
 
       - name: Fix upstream filename capitalization
