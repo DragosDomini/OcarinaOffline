@@ -43,6 +43,11 @@ jobs:
           config.write_text(text.replace('base: "/",', 'base: "./",', 1))
           PY
 
+      - name: Fix upstream filename capitalization
+        working-directory: upstream
+        run: |
+          mv src/components/songs/Notebox.tsx src/components/songs/NoteBox.tsx
+
       - name: Install original player dependencies
         working-directory: upstream
         run: npm ci
