@@ -3,70 +3,37 @@ package com.cyndyr.ocarina
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
-import android.view.View
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.graphics.Color
-import android.view.Gravity
+import android.view.View
+import android.view.WindowManager
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
-    private lateinit var errorPanel: LinearLayout
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.rgb(23, 20, 33))
-        }
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         webView = WebView(this).apply {
-            setBackgroundColor(Color.rgb(23, 20, 33))
+            setBackgroundColor(android.graphics.Color.rgb(17, 19, 27))
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.mediaPlaybackRequiresUserGesture = false
-            settings.loadsImagesAutomatically = true
-            settings.javaScriptCanOpenWindowsAutomatically = true
+            settings.allowFileAccess = true
+            settings.allowContentAccess = true
             webChromeClient = WebChromeClient()
-            webViewClient = object : WebViewClient() {
-                override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-                    if (request.isForMainFrame) errorPanel.visibility = View.VISIBLE
-                }
-                override fun onPageFinished(view: WebView, url: String) {
-                    errorPanel.visibility = View.GONE
-                }
-            }
+            webViewClient = WebViewClient()
+            isVerticalScrollBarEnabled = false
+            isHorizontalScrollBarEnabled = false
         }
-        errorPanel = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(32, 32, 32, 32)
-            setBackgroundColor(Color.rgb(23, 20, 33))
-            visibility = View.GONE
-            addView(TextView(this@MainActivity).apply {
-                text = "Couldn't load Ocarina Player. Check your internet connection and try again."
-                setTextColor(Color.WHITE)
-                textSize = 16f
-                gravity = Gravity.CENTER
-            })
-            addView(Button(this@MainActivity).apply {
-                text = "Try again"
-                setOnClickListener { visibility = View.GONE; webView.reload() }
-            })
-        }
-        root.addView(webView, LinearLayout.LayoutParams(-1, 0, 1f))
-        root.addView(errorPanel, LinearLayout.LayoutParams(-1, -1))
-        setContentView(root)
-
+        setContentView(webView)
         if (savedInstanceState != null) webView.restoreState(savedInstanceState)
-        else webView.loadUrl("https://ocarina.toomuchofheaven.com/")
+        else webView.loadUrl("file:///android_asset/index.html")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -74,7 +41,7 @@ class MainActivity : Activity() {
         super.onSaveInstanceState(outState)
     }
 
-    @Deprecated("Deprecated in Android API, retained for broad device compatibility")
+    @Deprecated("Deprecated by Android; retained for older device compatibility")
     override fun onBackPressed() {
         if (::webView.isInitialized && webView.canGoBack()) webView.goBack()
         else super.onBackPressed()
