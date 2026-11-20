@@ -59,6 +59,12 @@ jobs:
       - name: Build original player
         working-directory: upstream
         run: npm run build --ignore-scripts
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
       - name: Package original player and use website icon
         run: |
           mkdir -p app/src/main/assets/site
@@ -85,10 +91,10 @@ jobs:
           yes | sdkmanager --licenses
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Set up Gradle 8.8
+      - name: Set up Gradle 9.9.2
         uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: "8.8"
+          gradle-version: "9.9.2"
 
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
