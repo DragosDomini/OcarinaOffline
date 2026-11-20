@@ -14,17 +14,17 @@ jobs:
 
     steps:
       - name: Check out Android app
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check out original Ocarina Player
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: vaexenc/ocarina
           ref: 47660e4fb4da068612439aeba8bef0e91eb1211b
           path: upstream
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "26"
           cache: npm
@@ -38,7 +38,8 @@ jobs:
 
           config = Path("vite.config.ts")
           text = config.read_text()
-          if 'base: "/",' not in text:
+          if 'base: "/", ' not in text and 'base: "/",'
+          not in text:
               raise SystemExit("Vite base setting was not found.")
           config.write_text(text.replace('base: "/",', 'base: "./",', 1))
           PY
@@ -77,7 +78,7 @@ jobs:
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle 8.7
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: "8.7"
 
@@ -85,7 +86,7 @@ jobs:
         run: gradle --no-daemon assembleDebug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: OcarinaPlayer-debug-apk
           path: app/build/outputs/apk/debug/*.apk
