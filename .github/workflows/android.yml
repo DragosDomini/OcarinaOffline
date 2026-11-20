@@ -13,8 +13,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Check out Android app
         uses: actions/checkout@v4
+
+      - name: Check out original Ocarina Player
+        uses: actions/checkout@v4
+        with:
+          repository: vaexenc/ocarina
+          ref: 47660e4fb4da068612439aeba8bef0e91eb1211b
+          path: upstream
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: upstream/package-lock.json
+
+      - name: Configure original player for offline use
+        working-directory: upstream
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          config = Path("vite.config.ts")
+          text = config.read_text()
+          if 'base: "/",' not in text:
+              raise SystemExit("Vite base setting was not found.")
+          config.write_text(text.replace('base: "/",', 'base: "./",', 1))
+          PY
+
+      - name: Install original player dependencies
+        working-directory: upstream
+        run: npm ci
+
+      - name: Build original player
+        working-directory: upstream
+        run: npm run build --ignore-scripts
+
+      - name: Package original player into Android app
+        run: |
+          mkdir -p app/src/main/assets/site
+          cp -R upstream/dist/. app/src/main/assets/site/
+          cp upstream/LICENSE app/src/main/assets/site/THIRD_PARTY_LICENSE_MIT.txt
 
       - name: Set up Java 17
         uses: actions/setup-java@v5
